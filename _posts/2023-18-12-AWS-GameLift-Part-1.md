@@ -10,7 +10,7 @@ tags: [cloud, aws, gamelift, privesc]
 Cloud providers are always working on improvements and adding more specific services to their platforms. The services extend an attack surface in cloud environments and can be overlooked during security assessments because there is no available information on how to assess them from an attacker’s perspective.
 This post will cover several new privilege escalation routes we discovered in AWS GameLift services - a service that allows Amazon clients to deploy, operate, and scale dedicated, low-cost servers in the cloud for session-based multiplayer games.
 
-## **What is GameLift? Intro to Gamelift**
+## What is GameLift? Intro to Gamelift
 
 Amazon GameLift provides a platform to host multiplayer games in the cloud. The service makes running and scaling game servers in the cloud easier.
 
@@ -28,7 +28,7 @@ GameLift runs game servers using the following building blocks: **Fleets**, **B
 - **Build** – a custom-built game server software that runs on Amazon GameLift and hosts game sessions for your players. A game build includes game server binaries, dependencies, and an installation script that handle tasks that install your game build on GameLift fleet. For more information, see [docs](https://docs.aws.amazon.com/gamelift/latest/developerguide/gamelift-build-cli-uploading.html).
 - **Script** – a JavaScript code that allows developers to configure custom game logic on lightweight Realtime Servers to host game sessions for your players. For more information, see [docs](https://docs.aws.amazon.com/gamelift/latest/developerguide/realtime-script-uploading.html).
 
-## Gamelift **Escalation Methods**
+## Gamelift Escalation Methods
 
 ### iam:PassRole, gamelift:CreateFleet, (gamelift:UploadBuild | gamelift:CreateBuild)
 
