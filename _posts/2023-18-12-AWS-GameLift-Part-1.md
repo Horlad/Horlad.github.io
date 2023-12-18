@@ -1,6 +1,6 @@
 ---
 title: "AWS GameLift: One more way to escalate privileges (Part 1)"
-date: 2023-18-12 17:45:00 +0100
+date: 2023-12-18 17:45:00 +0100
 categories: [Research]
 tags: [cloud, aws, gamelift, privesc]
 ---
